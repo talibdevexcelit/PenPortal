@@ -33,14 +33,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get("/api/ping", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Server is running",
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || "development",
-  });
-});
+app.get("/", (req, res) => res.send("Hello, World!"));
 
 // app.js
 app.get("/favicon.ico", (req, res) => res.status(204).end());
