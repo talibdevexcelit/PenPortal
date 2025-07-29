@@ -1,4 +1,5 @@
 import app from "./app.js"
-import serverless from "serverless-http";
+import ServerlessHttp from "serverless-http";
 
-export const handler = serverless(app);
+
+export const handler = ServerlessHttp(app);
