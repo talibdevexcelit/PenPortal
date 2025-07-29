@@ -43,7 +43,7 @@ app.get("/api/ping", (req, res) => {
 });
 
 // app.js
-app.get('/favicon.ico', (req, res) => res.status(204).end());
+app.get("/favicon.ico", (req, res) => res.status(204).end());
 
 app.use("/api/blog", postRoute);
 app.use("/api/auth", userRoute);
