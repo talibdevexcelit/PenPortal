@@ -12,4 +12,4 @@ if (process.env.NODE_ENV !== "production") {
 // Export for Vercel serverless function
 const handler = ServerlessHttp(app);
 
-export { handler };
+export default handler;
