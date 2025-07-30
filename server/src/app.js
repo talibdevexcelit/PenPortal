@@ -1,23 +1,23 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import connectDB from "./config/db.js";
 import postRoute from "./routes/postRoute.js";
 import userRoute from "./routes/userRoute.js";
 import adminRoute from "./routes/adminRoute.js";
 import errorHandler from "./middlewares/errorMiddleware.js";
+import { connectToDatabase } from "./db/connect.js";
 
 const app = express();
 dotenv.config();
 
-connectDB();
+connectToDatabase();
 
 // Middleware
 const corsOptions = {
   origin: function (origin, callback) {
     const allowedOrigins = [
       "http://localhost:5173",
-      "https://penportal.vercel.app", // Removed extra space
+      "https://penportal.vercel.app",
     ];
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
