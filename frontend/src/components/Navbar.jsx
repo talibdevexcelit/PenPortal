@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
+import { Sun, Moon, User, LogOut, Menu, X } from "lucide-react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
   const { user, logout, isAuthenticated } = useAuth();
+  const { isDarkMode, toggleTheme } = useTheme();
 
   const handleLogout = () => {
     logout();
@@ -13,250 +17,337 @@ const Navbar = () => {
   };
 
   const isAdmin = isAuthenticated() && user?.role === "admin";
-
-  // Logo and default route based on role
   const logoLink = isAdmin ? "/admin" : "/";
 
+  // Unified button class for consistent styling
+  const navLinkClass = (isActive = false) =>
+    `px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2
+    ${
+      isActive
+        ? isDarkMode
+          ? "bg-white/20 text-white"
+          : "bg-indigo-100 text-indigo-800"
+        : isDarkMode
+        ? "text-gray-300 hover:text-white hover:bg-white/10"
+        : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+    }`;
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-black/30 border-b border-white/20">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b transition-all duration-300
+        ${
+          isDarkMode
+            ? "bg-black/40 border-white/20 text-white"
+            : "bg-white/40 border-gray-200 text-black shadow-sm"
+        }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo - Points to /admin if admin, else / */}
-          <div className="flex-shrink-0">
-            <Link
-              to={logoLink}
-              className="text-2xl font-bold text-white hover:text-[#625080] transition-colors"
-            >
-              PenPortal
-            </Link>
-          </div>
+          {/* Logo */}
+          <Link
+            to={logoLink}
+            className={`text-2xl font-bold tracking-tight ${
+              isDarkMode ? "text-white" : "text-black"
+            } transition-colors`}
+          >
+            PenPortal
+          </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex md:items-center md:space-x-6">
-            {/* Public Links: Only show if NOT admin */}
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center space-x-4">
+            {/* Public Links (non-admin only) */}
             {!isAdmin && (
-              <div className="flex items-baseline space-x-1">
+              <div className="flex items-center space-x-1">
                 <Link
                   to="/"
-                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-all"
+                  className={navLinkClass(window.location.pathname === "/")}
                 >
                   Home
                 </Link>
                 <Link
                   to="/posts"
-                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-all"
+                  className={navLinkClass(
+                    window.location.pathname === "/posts"
+                  )}
                 >
                   Posts
                 </Link>
-                {/* <Link
-                  to="/about"
-                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-all"
-                >
-                  About
-                </Link> */}
               </div>
             )}
 
-            {/* Authenticated User Actions */}
-            <div className="flex items-center space-x-1">
-              {isAuthenticated() ? (
-                isAdmin ? (
-                  // 🔐 Admin View: Only Admin Dashboard, Welcome, Logout
-                  <>
-                    <Link
-                      to="/admin"
-                      className="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-all"
-                    >
-                      Admin Dashboard
-                    </Link>
-                    <span className="px-3 py-2 text-sm text-gray-300">
-                      Welcome, {user.name}!
-                    </span>
-                    <button
-                      onClick={handleLogout}
-                      className="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-all"
-                    >
-                      Logout
-                    </button>
-                  </>
-                ) : (
-                  // 👤 Regular User View
-                  <>
-                    <Link
-                      to="/create"
-                      className="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-all"
-                    >
-                      Create Post
-                    </Link>
-                    <Link
-                      to="/profile"
-                      className="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-all"
-                    >
-                      Profile
-                    </Link>
-                    <span className="px-3 py-2 text-sm text-gray-300">
-                      Welcome, {user.name}!
-                    </span>
-                    <button
-                      onClick={handleLogout}
-                      className="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-all"
-                    >
-                      Logout
-                    </button>
-                  </>
-                )
-              ) : (
-                // 🚪 Not logged in
-                <>
-                  <Link
-                    to="/login"
-                    className="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-all"
+            {/* Authenticated User: Show Dropdown on Hover */}
+            {isAuthenticated() ? (
+              <div
+                className="relative"
+                onMouseEnter={() => setIsDropdownOpen(true)}
+                onMouseLeave={() => setIsDropdownOpen(false)}
+              >
+                <button
+                  className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium cursor-pointer
+                    ${
+                      isDarkMode
+                        ? "text-gray-300 hover:bg-white/10"
+                        : "text-gray-700 hover:bg-gray-100"
+                    }`}
+                >
+                  <User size={18} />
+                  <span>{user.name}</span>
+                  {/* Dropdown Caret */}
+                  <svg
+                    className={`h-4 w-4 transition-transform duration-200 ${
+                      isDropdownOpen ? "rotate-180" : ""
+                    }`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                   >
-                    Login
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-all"
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {/* Dropdown Menu */}
+                {isDropdownOpen && (
+                  <div
+                    className={`absolute -right-3 mt-0.5 w-40 rounded-xl shadow-xl ring-1
+                      ${
+                        isDarkMode
+                          ? "bg-black/30 ring-white/10 text-gray-200"
+                          : "bg-white/30 ring-black/5 text-gray-700"
+                      } 
+                      overflow-hidden z-50`}
                   >
-                    Register
-                  </Link>
-                </>
-              )}
-            </div>
+                    <div className="">
+                      {isAdmin ? (
+                        <Link
+                          to="/admin"
+                          className={navLinkClass(
+                            window.location.pathname === "/admin"
+                          )}
+                        >
+                          Admin Dashboard
+                        </Link>
+                      ) : (
+                        <>
+                          <Link
+                            to="/create"
+                            className={navLinkClass(
+                              window.location.pathname === "/create"
+                            )}
+                          >
+                            Create Post
+                          </Link>
+                          <Link
+                            to="/profile"
+                            className={navLinkClass(
+                              window.location.pathname === "/profile"
+                            )}
+                          >
+                            Profile
+                          </Link>
+                        </>
+                      )}
+                      <button
+                        onClick={handleLogout}
+                        className={`w-full text-left px-4 py-2 text-sm font-medium flex items-center gap-2 cursor-pointer
+                          ${
+                            isDarkMode
+                              ? "text-red-300 hover:bg-red-900/30"
+                              : "text-red-600 hover:bg-red-50"
+                          }`}
+                      >
+                        <LogOut size={16} />
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Guest Links */
+              <div className="flex items-center space-x-1">
+                <Link
+                  to="/login"
+                  className={navLinkClass(
+                    window.location.pathname === "/login"
+                  )}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold
+                    ${
+                      isDarkMode
+                        ? "bg-[#625080] hover:bg-[#584775] text-white"
+                        : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                    }`}
+                >
+                  Register
+                </Link>
+              </div>
+            )}
+
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className={`p-2 rounded-full transition-colors cursor-pointer
+                ${
+                  isDarkMode
+                    ? "text-yellow-300 hover:bg-yellow-500/20"
+                    : "text-indigo-600 hover:bg-indigo-100"
+                }`}
+              aria-label={
+                isDarkMode ? "Switch to light mode" : "Switch to dark mode"
+              }
+            >
+              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center space-x-2">
+            <button
+              onClick={toggleTheme}
+              className={`p-2 rounded-full ${
+                isDarkMode ? "text-yellow-300" : "text-indigo-600"
+              }`}
+            >
+              {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-300 hover:text-white hover:bg-white/10 focus:outline-none"
+              className={`p-2 rounded-md
+                ${
+                  isDarkMode
+                    ? "text-gray-300 hover:text-white hover:bg-white/10"
+                    : "text-gray-700 hover:bg-gray-200"
+                }`}
             >
-              <svg
-                className={`${isMenuOpen ? "hidden" : "block"} h-6 w-6`}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-              <svg
-                className={`${isMenuOpen ? "block" : "hidden"} h-6 w-6`}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
       </div>
 
       {/* Mobile Menu */}
-      <div
-        className={`${
-          isMenuOpen ? "block" : "hidden"
-        } md:hidden backdrop-blur-md bg-black/30 border-t border-white/20`}
-      >
-        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          {/* Show public links only if NOT admin */}
-          {!isAdmin && (
-            <>
-              <Link
-                to="/"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10"
-              >
-                Home
-              </Link>
-              <Link
-                to="/posts"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10"
-              >
-                Posts
-              </Link>
-              {/* <Link
-                to="/about"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10"
-              >
-                About
-              </Link> */}
-            </>
-          )}
-
-          {isAuthenticated() ? (
-            isAdmin ? (
+      {isMenuOpen && (
+        <div
+          className={`md:hidden border-t transition-all duration-300 ease-in-out
+            ${
+              isDarkMode
+                ? "bg-black/40 border-white/20"
+                : "bg-white/80 border-gray-200"
+            }`}
+        >
+          <div className="px-4 pt-3 pb-4 space-y-2">
+            {!isAdmin && (
               <>
                 <Link
-                  to="/admin"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10"
+                  to="/"
+                  className={navLinkClass(window.location.pathname === "/")}
+                  onClick={() => setIsMenuOpen(false)}
                 >
-                  Admin Dashboard
+                  Home
                 </Link>
-                <div className="px-3 py-2 text-base text-gray-300">
+                <Link
+                  to="/posts"
+                  className={navLinkClass(
+                    window.location.pathname === "/posts"
+                  )}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Posts
+                </Link>
+              </>
+            )}
+
+            {isAuthenticated() ? (
+              <>
+                {isAdmin ? (
+                  <Link
+                    to="/admin"
+                    className={navLinkClass(
+                      window.location.pathname === "/admin"
+                    )}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    🛠️ Admin Dashboard
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      to="/create"
+                      className={navLinkClass(
+                        window.location.pathname === "/create"
+                      )}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      ✍️ Create Post
+                    </Link>
+                    <Link
+                      to="/profile"
+                      className={navLinkClass(
+                        window.location.pathname === "/profile"
+                      )}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      👤 Profile
+                    </Link>
+                  </>
+                )}
+                <div
+                  className={`px-4 py-2 text-sm rounded-lg font-medium ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                >
                   Welcome, {user.name}!
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10"
+                  className={`w-full text-left flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+                    ${
+                      isDarkMode
+                        ? "text-red-300 hover:bg-red-900/30"
+                        : "text-red-600 hover:bg-red-50"
+                    }`}
                 >
+                  <LogOut size={16} />
                   Logout
                 </button>
               </>
             ) : (
               <>
                 <Link
-                  to="/create"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10"
+                  to="/login"
+                  className={navLinkClass(
+                    window.location.pathname === "/login"
+                  )}
+                  onClick={() => setIsMenuOpen(false)}
                 >
-                  Create Post
+                  Login
                 </Link>
                 <Link
-                  to="/profile"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10"
+                  to="/register"
+                  className={`w-full text-center px-4 py-2 rounded-lg text-sm font-semibold text-white
+                    ${
+                      isDarkMode
+                        ? "bg-indigo-600 hover:bg-indigo-700"
+                        : "bg-indigo-600 hover:bg-indigo-700"
+                    }`}
+                  onClick={() => setIsMenuOpen(false)}
                 >
-                  Profile
+                  Register
                 </Link>
-                <div className="px-3 py-2 text-base text-gray-300">
-                  Welcome, {user.name}!
-                </div>
-                <button
-                  onClick={handleLogout}
-                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10"
-                >
-                  Logout
-                </button>
               </>
-            )
-          ) : (
-            <>
-              <Link
-                to="/login"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10"
-              >
-                Login
-              </Link>
-              <Link
-                to="/register"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-white/10"
-              >
-                Register
-              </Link>
-            </>
-          )}
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 };

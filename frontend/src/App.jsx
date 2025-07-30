@@ -13,97 +13,94 @@ import BlogDetails from "./pages/BlogDetails";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import { AuthProvider } from "./context/AuthContext";
+import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import Profile from "./pages/Profile";
 import AdminDashboard from "./pages/AdminDashboard";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import Iridescence from "./components/background/Iridescence";
+
+const ConditionalBackground = () => {
+  const { isDarkMode } = useTheme();
+
+  return (
+    <div className="fixed inset-0 z-0">
+      {isDarkMode ? (
+        <DarkVeil />
+      ) : (
+        <Iridescence/>
+      )}
+    </div>
+  );
+};
 
 const App = () => {
   return (
     <Router>
       <AuthProvider>
-        <div className="min-h-screen relative">
-          {/* Background */}
-          <div className="fixed inset-0 z-0">
-            <DarkVeil />
+        <ThemeProvider>
+          <div className="min-h-screen relative bg-white dark:bg-black">
+            {/* Background */}
+            <ConditionalBackground />
+
+            {/* Foreground */}
+            <div className="relative z-10">
+              <Navbar />
+              <main className="pt-16">
+                <Routes>
+                  {/* Public Routes (No protection) */}
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+
+                  {/* Protected Routes */}
+                  <Route path="/" element={<Home />} />
+                  <Route path="/posts" element={<Posts />} />
+                  <Route path="/posts/:id" element={<BlogDetails />} />
+                  <Route
+                    path="/create"
+                    element={
+                      <ProtectedRoute>
+                        <CreatePost />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/edit/:id"
+                    element={
+                      <ProtectedRoute>
+                        <EditPost />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/about"
+                    element={
+                      <ProtectedRoute>
+                        <About />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute>
+                        <Profile />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin"
+                    element={
+                      <ProtectedRoute>
+                        <AdminDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                </Routes>
+              </main>
+              <Footer />
+            </div>
           </div>
-
-          {/* Foreground */}
-          <div className="relative z-10">
-            <Navbar />
-            <main className="pt-16">
-              <Routes>
-                {/* Public Routes (No protection) */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-
-                {/* Protected Routes */}
-                <Route
-                  path="/"
-                  element={
-
-                    <Home />
-
-                  }
-                />
-                <Route
-                  path="/posts"
-                  element={
-
-                    <Posts />
-
-                  }
-                />
-                <Route
-                  path="/posts/:id"
-                  element={
-                    <BlogDetails />
-                  }
-                />
-                <Route
-                  path="/create"
-                  element={
-                    <ProtectedRoute>
-                      <CreatePost />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/edit/:id"
-                  element={
-                    <ProtectedRoute>
-                      <EditPost />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/about"
-                  element={
-                    <ProtectedRoute>
-                      <About />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/profile"
-                  element={
-                    <ProtectedRoute>
-                      <Profile />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin"
-                  element={
-                    <ProtectedRoute>
-                      <AdminDashboard />
-                    </ProtectedRoute>
-                  }
-                />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
-        </div>
+        </ThemeProvider>
       </AuthProvider>
     </Router>
   );
