@@ -17,7 +17,8 @@ const corsOptions = {
   origin: function (origin, callback) {
     const allowedOrigins = [
       "http://localhost:5173",
-      "https://penportal.vercel.app",
+      "https://penportal-six.vercel.app",
+      "https://penportal-6gma3hhl7-talibabbasdevexcelit-6142s-projects.vercel.app",
     ];
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
