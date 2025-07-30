@@ -42,12 +42,4 @@ app.use("/api/blog", postRoute);
 app.use("/api/auth", userRoute);
 app.use("/api/admin", adminRoute);
 
-// Error handling middleware
-app.use(errorHandler);
-
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({ message: "Route not found" });
-});
-
 export default app;
