@@ -23,16 +23,21 @@ const corsOptions = {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.log(`CORS error: Origin ${origin} not allowed`); // Log for debugging
       callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  optionsSuccessStatus: 200,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Explicitly allow methods
+  allowedHeaders: ["Content-Type", "Authorization"], // Allow common headers
+  optionsSuccessStatus: 200, // For legacy browsers
 };
 
+// Apply CORS middleware globally
 app.use(cors(corsOptions));
+
+// Explicitly handle preflight OPTIONS requests for all routes
+app.options("*", cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
