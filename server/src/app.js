@@ -12,50 +12,38 @@ dotenv.config();
 
 connectToDatabase();
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://penportal-six.vercel.app",
-  "https://penportal-6gma3hhl7-talibabbasdevexcelit-6142s-projects.vercel.app",
-  "https://penportal-server-git-main-talibabbasdevexcelit-6142s-projects.vercel.app"
-];
-
+// Middleware
 const corsOptions = {
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps, curl, etc.)
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      "http://localhost:5173",
+      "https://penportal-six.vercel.app",
+      "https://penportal-6gma3hhl7-talibabbasdevexcelit-6142s-projects.vercel.app",
+    ];
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.warn("CORS blocked: ", origin);
-      callback(new Error("Not allowed by CORS"), false);
+      callback(new Error("Not allowed by CORS"));
     }
   },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
+  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
-
-// Optional: Explicitly handle OPTIONS (preflight) — usually not needed as cors() does it
-app.options("*", cors(corsOptions));
-
-// Body parsing
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Test route
-app.get("/", (req, res) => {
-  res.send("Hello, World! 🚀");
-});
+app.get("/", (req, res) => res.send("Hello, World!"));
 
+// app.js
 app.get("/favicon.ico", (req, res) => res.status(204).end());
 
-// API routes
 app.use("/api/blog", postRoute);
 app.use("/api/auth", userRoute);
 app.use("/api/admin", adminRoute);
 
-// Error handling
+// Error handling middleware
 app.use(errorHandler);
 
 // 404 handler
