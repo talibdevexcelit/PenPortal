@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import TiltedCard from '../components/TitledCard'; // Note: fix typo if needed (Titled → Card?)
 import { useTheme } from '../context/ThemeContext';
+import axios from 'axios'; // Import axios
 
 const Home = () => {
-  const { isDarkMode } = useTheme(); // Use theme context
+  const { isDarkMode } = useTheme();
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
   const [searchTerm, setSearchTerm] = useState('');
   const [featuredPosts, setFeaturedPosts] = useState([]);
@@ -16,10 +17,11 @@ const Home = () => {
 
   const fetchFeaturedPosts = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/api/blog/post`);
-      const result = await response.json();
+      const response = await axios.get(`${BASE_URL}/api/blog/post`); // Axios GET request
 
-      if (response.ok && result.status === true) {
+      const result = response.data;
+
+      if (result.status === true) {
         const posts = Array.isArray(result.data) ? result.data : [];
         setFeaturedPosts(posts.slice(0, 6));
       } else {
@@ -27,7 +29,14 @@ const Home = () => {
         setFeaturedPosts([]);
       }
     } catch (err) {
-      console.error('Error fetching posts:', err);
+      // Handle network errors or non-2xx responses
+      if (err.response) {
+        console.error('Response Error:', err.response.data);
+      } else if (err.request) {
+        console.error('No response received:', err.request);
+      } else {
+        console.error('Error:', err.message);
+      }
       setFeaturedPosts([]);
     } finally {
       setLoading(false);
@@ -37,7 +46,6 @@ const Home = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      // Use Link behavior properly via navigate
       window.location.href = `/posts?search=${encodeURIComponent(searchTerm.trim())}`;
     }
   };
@@ -218,41 +226,6 @@ const Home = () => {
           </div>
         )}
       </div>
-
-      {/* Call to Action (Optional - Uncomment if needed) */}
-      {/* <div
-        className={`${
-          isDarkMode
-            ? 'bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-md border border-white/20'
-            : 'bg-gradient-to-r from-indigo-50 to-purple-50 border border-gray-200'
-        } rounded-3xl p-8 md:p-12 text-center`}
-      >
-        <h3
-          className={`text-2xl md:text-3xl font-bold mb-4 ${
-            isDarkMode ? 'text-white' : 'text-gray-800'
-          }`}
-        >
-          Ready to Share Your Story?
-        </h3>
-        <p
-          className={`mb-8 max-w-2xl mx-auto ${
-            isDarkMode ? 'text-gray-300' : 'text-gray-600'
-          }`}
-        >
-          Join our community of writers and start publishing your thoughts today. It's free and easy to get started.
-        </p>
-        <Link
-          to="/create"
-          className={`inline-block px-8 py-4 font-medium rounded-lg shadow-sm transition-all transform hover:scale-105
-            ${
-              isDarkMode
-                ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-            }`}
-        >
-          Create Your First Post
-        </Link>
-      </div> */}
     </div>
   );
 };
