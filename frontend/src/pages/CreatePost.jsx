@@ -118,6 +118,7 @@ const CreatePost = () => {
           tags: ''
         });
         fetchPosts(); // Refresh list
+        navigate("/posts")
       } else {
         setError(result.message || 'Failed to create post');
       }
