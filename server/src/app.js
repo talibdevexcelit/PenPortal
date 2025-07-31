@@ -7,8 +7,8 @@ import adminRoute from "./routes/adminRoute.js";
 import errorHandler from "./middlewares/errorMiddleware.js";
 import { connectToDatabase } from "./db/connect.js";
 
-const app = express();
 dotenv.config();
+const app = express();
 
 // Connect to MongoDB
 connectToDatabase().catch((err) => {
@@ -16,7 +16,7 @@ connectToDatabase().catch((err) => {
   process.exit(1);
 });
 
-// CORS configuration
+// Allowed origins
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",")
   : [
@@ -26,34 +26,30 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
       "https://penportal-server-git-main-talibabbasdevexcelit-6142s-projects.vercel.app"
     ];
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.error(`CORS blocked for origin: ${origin}`);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-    optionsSuccessStatus: 200,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+// Simplified CORS middleware
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like curl/postman) or if origin is in the list
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`Blocked CORS request from origin: ${origin}`);
+      callback(new Error("CORS not allowed for this origin"));
+    }
+  },
+  credentials: true
+}));
 
-// Middleware
+// JSON parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Basic route for testing
+// Test route
 app.get("/", (req, res) => {
   console.log("Request to / from:", req.headers.origin);
   res.json({ message: "Hello, World! Backend is running." });
 });
 
-// Public test endpoint to verify CORS
 app.get("/api/test", (req, res) => {
   console.log("Request to /api/test from:", req.headers.origin);
   res.json({
@@ -64,18 +60,18 @@ app.get("/api/test", (req, res) => {
   });
 });
 
-// Handle favicon requests
+// Favicon ignore
 app.get("/favicon.ico", (req, res) => res.status(204).end());
 
-// API routes
+// Routes
 app.use("/api/blog", postRoute);
 app.use("/api/auth", userRoute);
 app.use("/api/admin", adminRoute);
 
-// Error handling middleware
+// Error middleware
 app.use(errorHandler);
 
-// 404 handler
+// 404
 app.use((req, res) => {
   res.status(404).json({
     status: false,
