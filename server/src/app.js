@@ -1,15 +1,13 @@
-// ./app.js
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import postRoute from "./routes/postRoute.js";
 import userRoute from "./routes/userRoute.js";
 import adminRoute from "./routes/adminRoute.js";
 import errorHandler from "./middlewares/errorMiddleware.js";
 import { connectToDatabase } from "./db/connect.js";
-import { corsMiddleware } from "./middlewares/corsMiddleware.js";
 
 dotenv.config();
-
 const app = express();
 
 // Connect to MongoDB
@@ -18,8 +16,16 @@ connectToDatabase().catch((err) => {
   process.exit(1);
 });
 
-// Use custom CORS middleware FIRST
-app.use(corsMiddleware);
+// Allowed origins
+const BASE_URL = process.env.BASE_URL;
+
+// Simplified CORS middleware
+app.use(
+  cors({
+    origin: BASE_URL,
+    credentials: true,
+  })
+);
 
 // JSON parsing
 app.use(express.json());
@@ -27,10 +33,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // Test route
 app.get("/", (req, res) => {
+  console.log("Request to / from:", req.headers.origin);
   res.json({ message: "Hello, World! Backend is running." });
 });
 
 app.get("/api/test", (req, res) => {
+  console.log("Request to /api/test from:", req.headers.origin);
   res.json({
     status: true,
     message: "Public test endpoint",
@@ -47,10 +55,10 @@ app.use("/api/blog", postRoute);
 app.use("/api/auth", userRoute);
 app.use("/api/admin", adminRoute);
 
-// Error middleware (must come after routes)
+// Error middleware
 app.use(errorHandler);
 
-// 404 handler
+// 404
 app.use((req, res) => {
   res.status(404).json({
     status: false,
