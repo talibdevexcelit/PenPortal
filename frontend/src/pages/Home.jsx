@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import TiltedCard from '../components/TitledCard'; // Note: fix typo if needed (Titled → Card?)
-import { useTheme } from '../context/ThemeContext';
-import axios from 'axios'; // Import axios
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import TiltedCard from "../components/TitledCard";
+import { useTheme } from "../context/ThemeContext";
+import axios from "axios";
 
 const Home = () => {
   const { isDarkMode } = useTheme();
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [featuredPosts, setFeaturedPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null); // Added error state
 
   useEffect(() => {
     fetchFeaturedPosts();
@@ -17,7 +18,19 @@ const Home = () => {
 
   const fetchFeaturedPosts = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/blog/post`); // Axios GET request
+      setLoading(true);
+      setError(null);
+
+      // Get token from localStorage (or your auth method)
+      const token = localStorage.getItem("token"); // Adjust based on how you store the token
+
+      const response = await axios.get(`${BASE_URL}/api/blog/post`, {
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }), // Include token if available
+        },
+        withCredentials: true, // Enable if backend uses cookies
+      });
 
       const result = response.data;
 
@@ -25,17 +38,24 @@ const Home = () => {
         const posts = Array.isArray(result.data) ? result.data : [];
         setFeaturedPosts(posts.slice(0, 6));
       } else {
-        console.error('API Error:', result.message || 'Failed to fetch posts');
+        console.error("API Error:", result.message || "Failed to fetch posts");
+        setError(result.message || "Failed to fetch posts");
         setFeaturedPosts([]);
       }
     } catch (err) {
-      // Handle network errors or non-2xx responses
       if (err.response) {
-        console.error('Response Error:', err.response.data);
+        console.error("Response Error:", err.response.data);
+        setError(
+          err.response.data.message || `HTTP Error: ${err.response.status}`
+        );
       } else if (err.request) {
-        console.error('No response received:', err.request);
+        console.error("No response received:", err.request);
+        setError(
+          "No response from server. Check your network or server status."
+        );
       } else {
-        console.error('Error:', err.message);
+        console.error("Error:", err.message);
+        setError(err.message);
       }
       setFeaturedPosts([]);
     } finally {
@@ -46,7 +66,9 @@ const Home = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      window.location.href = `/posts?search=${encodeURIComponent(searchTerm.trim())}`;
+      window.location.href = `/posts?search=${encodeURIComponent(
+        searchTerm.trim()
+      )}`;
     }
   };
 
@@ -54,24 +76,23 @@ const Home = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Hero Section */}
       <div className="text-center mb-16">
-        <h1 className={`text-4xl md:text-6xl font-bold mb-6 ${
-              isDarkMode ? 'text-white/80' : 'text-gray-800'
-            }`}>
-          Welcome to{' '}
-          <span
-            className={`${
-              isDarkMode ? 'text-white' : 'text-black'
-            }`}
-          >
+        <h1
+          className={`text-4xl md:text-6xl font-bold mb-6 ${
+            isDarkMode ? "text-white/80" : "text-gray-800"
+          }`}
+        >
+          Welcome to{" "}
+          <span className={`${isDarkMode ? "text-white" : "text-black"}`}>
             PenPortal
           </span>
         </h1>
         <p
           className={`text-lg md:text-xl ${
-            isDarkMode ? 'text-gray-300' : 'text-gray-900'
+            isDarkMode ? "text-gray-300" : "text-gray-900"
           } mb-12 max-w-3xl mx-auto`}
         >
-          Discover amazing stories, share your thoughts, and connect with our community of writers and readers.
+          Discover amazing stories, share your thoughts, and connect with our
+          community of writers and readers.
         </p>
 
         {/* Search Bar */}
@@ -81,8 +102,8 @@ const Home = () => {
               className={`relative rounded-full transition-all duration-300 shadow-lg
                 ${
                   isDarkMode
-                    ? 'backdrop-blur-md bg-white/20 border border-white/30 hover:bg-white/30'
-                    : 'backdrop-blur-sm bg-gray-100 border border-gray-300 hover:bg-gray-200'
+                    ? "backdrop-blur-md bg-white/20 border border-white/30 hover:bg-white/30"
+                    : "backdrop-blur-sm bg-gray-100 border border-gray-300 hover:bg-gray-200"
                 }`}
             >
               <input
@@ -93,8 +114,8 @@ const Home = () => {
                 className={`w-full py-4 pl-6 pr-20 rounded-full bg-transparent text-lg focus:outline-none focus:ring-2
                   ${
                     isDarkMode
-                      ? 'text-white placeholder-gray-300 focus:ring-[#625080]/50'
-                      : 'text-black placeholder-gray-500 focus:ring-indigo-500'
+                      ? "text-white placeholder-gray-300 focus:ring-[#625080]/50"
+                      : "text-black placeholder-gray-500 focus:ring-indigo-500"
                   }`}
               />
               <button
@@ -103,8 +124,8 @@ const Home = () => {
                   rounded-full p-3 transition-colors
                   ${
                     isDarkMode
-                      ? 'bg-[#625080] text-white hover:bg-[#7a649e]'
-                      : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                      ? "bg-[#625080] text-white hover:bg-[#7a649e]"
+                      : "bg-indigo-600 text-white hover:bg-indigo-700"
                   }`}
               >
                 <svg
@@ -131,7 +152,7 @@ const Home = () => {
         <div className="flex flex-col sm:flex-row justify-between items-center mb-10 gap-4">
           <h2
             className={`text-3xl font-bold ${
-              isDarkMode ? 'text-white' : 'text-black'
+              isDarkMode ? "text-white" : "text-black"
             }`}
           >
             Featured Posts
@@ -141,8 +162,8 @@ const Home = () => {
             className={`px-6 py-2 rounded-lg transition-all flex items-center gap-2 text-sm sm:text-base
               ${
                 isDarkMode
-                  ? 'bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 backdrop-blur-sm'
-                  : 'bg-gray-200 hover:bg-gray-300 text-black border border-gray-300 hover:border-gray-400'
+                  ? "bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 backdrop-blur-sm"
+                  : "bg-gray-200 hover:bg-gray-300 text-black border border-gray-300 hover:border-gray-400"
               }`}
           >
             View All Posts
@@ -166,29 +187,65 @@ const Home = () => {
           <div className="flex justify-center items-center h-64">
             <div
               className={`animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 ${
-                isDarkMode ? 'border-blue-500' : 'border-indigo-600'
+                isDarkMode ? "border-blue-500" : "border-indigo-600"
               }`}
             ></div>
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <div
+              className={`${
+                isDarkMode
+                  ? "bg-white/10 backdrop-blur-md border border-white/20"
+                  : "bg-gray-100 border border-gray-200"
+              } rounded-2xl p-8 max-w-2xl mx-auto`}
+            >
+              <h3
+                className={`text-xl font-semibold mb-2 ${
+                  isDarkMode ? "text-white" : "text-gray-800"
+                }`}
+              >
+                Error Fetching Posts
+              </h3>
+              <p
+                className={`mb-6 ${
+                  isDarkMode ? "text-gray-300" : "text-gray-600"
+                }`}
+              >
+                {error}
+              </p>
+              <button
+                onClick={fetchFeaturedPosts}
+                className={`inline-block px-6 py-3 font-medium rounded-lg transition-all transform hover:scale-105
+                  ${
+                    isDarkMode
+                      ? "bg-[#625080] hover:bg-[#7a649e] text-white"
+                      : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                  }`}
+              >
+                Retry
+              </button>
+            </div>
           </div>
         ) : featuredPosts.length === 0 ? (
           <div className="text-center py-12">
             <div
               className={`${
                 isDarkMode
-                  ? 'bg-white/10 backdrop-blur-md border border-white/20'
-                  : 'bg-gray-100 border border-gray-200'
+                  ? "bg-white/10 backdrop-blur-md border border-white/20"
+                  : "bg-gray-100 border border-gray-200"
               } rounded-2xl p-8 max-w-2xl mx-auto`}
             >
               <h3
                 className={`text-xl font-semibold mb-2 ${
-                  isDarkMode ? 'text-white' : 'text-gray-800'
+                  isDarkMode ? "text-white" : "text-gray-800"
                 }`}
               >
                 No posts yet
               </h3>
               <p
                 className={`mb-6 ${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                  isDarkMode ? "text-gray-300" : "text-gray-600"
                 }`}
               >
                 Be the first to share your thoughts!
@@ -198,8 +255,8 @@ const Home = () => {
                 className={`inline-block px-6 py-3 font-medium rounded-lg transition-all transform hover:scale-105
                   ${
                     isDarkMode
-                      ? 'bg-[#625080] hover:bg-[#7a649e] text-white'
-                      : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                      ? "bg-[#625080] hover:bg-[#7a649e] text-white"
+                      : "bg-indigo-600 hover:bg-indigo-700 text-white"
                   }`}
               >
                 Create Your First Post
@@ -213,7 +270,7 @@ const Home = () => {
                 key={post._id}
                 id={post._id}
                 title={post.title}
-                excerpt={post.content.substring(0, 100) + '...'}
+                excerpt={post.content.substring(0, 100) + "..."}
                 author={post.author}
                 date={post.createdAt}
                 tags={post.tags}
