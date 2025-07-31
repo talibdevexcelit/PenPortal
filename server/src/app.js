@@ -19,8 +19,9 @@ const corsOptions = {
       "http://localhost:5173",
       "https://penportal-six.vercel.app",
       "https://penportal-6gma3hhl7-talibabbasdevexcelit-6142s-projects.vercel.app",
+      "https://penportal-server-git-main-talibabbasdevexcelit-6142s-projects.vercel.app"
     ];
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       console.warn("CORS blocked:", origin);
@@ -29,6 +30,8 @@ const corsOptions = {
   },
   credentials: true,
   optionsSuccessStatus: 200,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
 };
 
 app.use(cors(corsOptions)); // Apply CORS early
