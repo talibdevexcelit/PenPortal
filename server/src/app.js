@@ -12,7 +12,7 @@ dotenv.config();
 
 connectToDatabase();
 
-// Middleware
+// CORS Configuration
 const corsOptions = {
   origin: function (origin, callback) {
     const allowedOrigins = [
@@ -23,27 +23,19 @@ const corsOptions = {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.log(`CORS error: Origin ${origin} not allowed`); // Log for debugging
-      callback(new Error("Not allowed by CORS"));
+      console.warn("CORS blocked:", origin);
+      callback(null, false);
     }
   },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Explicitly allow methods
-  allowedHeaders: ["Content-Type", "Authorization"], // Allow common headers
-  optionsSuccessStatus: 200, // For legacy browsers
+  optionsSuccessStatus: 200,
 };
 
-// Apply CORS middleware globally
-app.use(cors(corsOptions));
-
-// Explicitly handle preflight OPTIONS requests for all routes
-app.options("*", cors(corsOptions));
+app.use(cors(corsOptions)); // Apply CORS early
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => res.send("Hello, World!"));
-
-// app.js
 app.get("/favicon.ico", (req, res) => res.status(204).end());
 
 app.use("/api/blog", postRoute);
