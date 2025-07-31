@@ -13,15 +13,17 @@ dotenv.config();
 // Connect to MongoDB
 connectToDatabase().catch((err) => {
   console.error("Failed to connect to MongoDB:", err);
-  process.exit(1); // Exit if MongoDB connection fails
+  process.exit(1);
 });
 
 // CORS configuration
-const allowedOrigins = [
-  "https://penportal-six.vercel.app", // Production frontend
-  "http://localhost:5173", // Local development
-  "https://penportal-6gma3hhl7-talibabbasdevexcelit-6142s-projects.vercel.app", // Preview deployment
-];
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",")
+  : [
+      "https://penportal-six.vercel.app",
+      "http://localhost:5173",
+      "https://penportal-6gma3hhl7-talibabbasdevexcelit-6142s-projects.vercel.app",
+    ];
 
 app.use(
   cors({
@@ -46,8 +48,19 @@ app.use(express.urlencoded({ extended: true }));
 
 // Basic route for testing
 app.get("/", (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*"); // Fallback for debugging
+  console.log("Request to / from:", req.headers.origin);
   res.json({ message: "Hello, World! Backend is running." });
+});
+
+// Public test endpoint to verify CORS
+app.get("/api/test", (req, res) => {
+  console.log("Request to /api/test from:", req.headers.origin);
+  res.json({
+    status: true,
+    message: "Public test endpoint",
+    data: null,
+    error: null,
+  });
 });
 
 // Handle favicon requests
@@ -58,13 +71,17 @@ app.use("/api/blog", postRoute);
 app.use("/api/auth", userRoute);
 app.use("/api/admin", adminRoute);
 
-// Error handling middleware (must be after routes)
+// Error handling middleware
 app.use(errorHandler);
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ message: "Route not found" });
+  res.status(404).json({
+    status: false,
+    message: "Route not found",
+    data: null,
+    error: { message: "Not found" },
+  });
 });
 
-// Export for Vercel serverless
 export default app;
