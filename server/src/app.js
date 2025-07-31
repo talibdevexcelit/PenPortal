@@ -23,19 +23,12 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
       "https://penportal-six.vercel.app",
       "http://localhost:5173",
       "https://penportal-6gma3hhl7-talibabbasdevexcelit-6142s-projects.vercel.app",
+      "https://penportal-server-git-main-talibabbasdevexcelit-6142s-projects.vercel.app",
     ];
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.error(`CORS blocked for origin: ${origin}`);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
+    origin: "*",
     optionsSuccessStatus: 200,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
