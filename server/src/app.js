@@ -35,6 +35,10 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions)); // Apply CORS early
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
