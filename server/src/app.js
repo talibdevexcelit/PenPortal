@@ -12,44 +12,50 @@ dotenv.config();
 
 connectToDatabase();
 
-// CORS Configuration
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://penportal-six.vercel.app",
+  "https://penportal-6gma3hhl7-talibabbasdevexcelit-6142s-projects.vercel.app",
+  "https://penportal-server-git-main-talibabbasdevexcelit-6142s-projects.vercel.app"
+];
+
 const corsOptions = {
-  origin: function (origin, callback) {
-    const allowedOrigins = [
-      "http://localhost:5173",
-      "https://penportal-six.vercel.app",
-      "https://penportal-6gma3hhl7-talibabbasdevexcelit-6142s-projects.vercel.app",
-      "https://penportal-server-git-main-talibabbasdevexcelit-6142s-projects.vercel.app"
-    ];
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, etc.)
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.warn("CORS blocked:", origin);
-      callback(null, false);
+      console.warn("CORS blocked: ", origin);
+      callback(new Error("Not allowed by CORS"), false);
     }
   },
   credentials: true,
-  optionsSuccessStatus: 200,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
 };
 
-app.use(cors(corsOptions)); // Apply CORS early
+app.use(cors(corsOptions));
 
-// Handle preflight requests
-app.options('*', cors(corsOptions));
+// Optional: Explicitly handle OPTIONS (preflight) — usually not needed as cors() does it
+app.options("*", cors(corsOptions));
 
-app.use(express.json());
+// Body parsing
+app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-app.get("/", (req, res) => res.send("Hello, World!"));
+// Test route
+app.get("/", (req, res) => {
+  res.send("Hello, World! 🚀");
+});
+
 app.get("/favicon.ico", (req, res) => res.status(204).end());
 
+// API routes
 app.use("/api/blog", postRoute);
 app.use("/api/auth", userRoute);
 app.use("/api/admin", adminRoute);
 
-// Error handling middleware
+// Error handling
 app.use(errorHandler);
 
 // 404 handler
