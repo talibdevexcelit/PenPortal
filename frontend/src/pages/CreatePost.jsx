@@ -224,8 +224,8 @@ const CreatePost = () => {
         <div
           className={`${
             isDarkMode
-              ? 'bg-white/10 backdrop-blur-md border border-white/20'
-              : 'bg-white/10 shadow-md border border-white/20'
+              ? 'bg-black/70 backdrop-blur-md border border-white/20'
+              : 'bg-white/70 shadow-md border border-white/20'
           } rounded-2xl p-8 transition-all duration-300`}
         >
           <h1

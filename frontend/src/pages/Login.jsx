@@ -17,6 +17,7 @@ const Login = () => {
   const [resetEmail, setResetEmail] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
+  const [resetError, setResetError] = useState("");
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
   const { isDarkMode } = useTheme(); // Use current theme
@@ -72,12 +73,12 @@ const Login = () => {
 
   const handlePasswordReset = async () => {
     if (!resetEmail) {
-      setError("Please enter your email address");
+      setResetError("Please enter your email address");
       return;
     }
 
     setResetLoading(true);
-    setError("");
+    setResetError("");
 
     try {
       const response = await fetch(`${BASE_URL}/api/auth/forgot-password`, {
@@ -101,10 +102,10 @@ const Login = () => {
           navigate(`/forgot-password?token=${data.data.resetToken}`);
         }, 3000);
       } else {
-        setError(data.message || "Failed to send reset email");
+        setResetError(data.message || "Failed to send reset email");
       }
     } catch (err) {
-      setError("Network error. Please try again.");
+      setResetError("Network error. Please try again.");
       console.error("Error:", err);
     } finally {
       setResetLoading(false);
@@ -117,8 +118,8 @@ const Login = () => {
         <div
           className={`${
             isDarkMode
-              ? "bg-white/10 backdrop-blur-md border border-white/20"
-              : "bg-white/10 shadow-xl border border-black/20"
+              ? "bg-black/70 backdrop-blur-md border border-white/20"
+              : "bg-white/70 shadow-xl border border-black/20"
           } rounded-2xl p-8 transition-all duration-300`}
         >
           <div className="text-center mb-8">
@@ -286,73 +287,145 @@ const Login = () => {
               >
                 Forgot your password?
               </button>
-              
-              {/* Forgot Password Modal */}
-               {showForgotPasswordModal && (
-                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-                   <div className={`${isDarkMode ? 'bg-black border border-white/20' : 'bg-neutral-200 border border-gray-200'} rounded-lg shadow-xl p-6 w-full max-w-sm`}>
-                     {resetSuccess ? (
-                       <div className="text-center">
-                         <div className="mb-4 flex justify-center">
-                           <svg className="w-16 h-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                           </svg>
-                         </div>
-                         <h3 className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-black'}`}>Email Sent!</h3>
-                         <p className={`mb-6 ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
-                           We've sent a password reset link to your email. You'll be redirected to the reset page shortly.
-                         </p>
-                       </div>
-                     ) : (
-                       <>
-                         <h3 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Reset Password</h3>
-                         <p className={`mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Enter your email address and we'll send you a link to reset your password.</p>
-                         
-                         {error && (
-                           <div className={`mb-4 p-3 rounded-lg text-sm ${isDarkMode ? 'bg-red-500/20 border border-red-500/30 text-red-200' : 'bg-red-50 border border-red-200 text-red-700'}`}>
-                             {error}
-                           </div>
-                         )}
-                         
-                         <div className="mb-4">
-                           <label htmlFor="reset-email" className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>Email address</label>
-                           <input
-                             id="reset-email"
-                             type="email"
-                             className={`w-full px-3 py-2 rounded-lg border ${isDarkMode ? 'bg-black/20 border-white/30 text-white' : 'bg-white border-gray-300 text-black'} focus:outline-none focus:ring-2 focus:ring-[#625080]`}
-                             placeholder="Enter your email"
-                             value={resetEmail}
-                             onChange={(e) => setResetEmail(e.target.value)}
-                           />
-                         </div>
-                         
-                         <div className="flex justify-end space-x-3">
-                           <button
-                             type="button"
-                             onClick={() => {
-                               setShowForgotPasswordModal(false);
-                               setResetEmail('');
-                               setError('');
-                             }}
-                             className={`px-4 py-2 rounded-md cursor-pointer ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
-                           >
-                             Cancel
-                           </button>
-                           <button
-                             type="button"
-                             onClick={handlePasswordReset}
-                             className={`px-4 py-2 rounded-md text-white cursor-pointer ${isDarkMode ? 'bg-[#625080] hover:bg-[#7a649e]' : 'bg-indigo-600 hover:bg-indigo-700'}`}
-                             disabled={resetLoading}
-                           >
-                             {resetLoading ? 'Sending...' : 'Send Reset Link'}
-                           </button>
-                         </div>
-                       </>
-                     )}
-                   </div>
-                 </div>
-               )}
 
+              {/* Forgot Password Modal */}
+              {showForgotPasswordModal && (
+                <div 
+                  className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+                  onClick={(e) => {
+                    // Close modal when clicking on backdrop
+                    if (e.target === e.currentTarget) {
+                      setShowForgotPasswordModal(false);
+                      setResetEmail("");
+                      setError("");
+                    }
+                  }}
+                >
+                  <div
+                    className={`${
+                      isDarkMode
+                        ? "bg-black border border-white/20"
+                        : "bg-neutral-200 border border-gray-200"
+                    } rounded-lg shadow-xl p-6 w-full max-w-sm`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {resetSuccess ? (
+                      <div className="text-center">
+                        <div className="mb-4 flex justify-center">
+                          <svg
+                            className="w-16 h-16 text-green-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            ></path>
+                          </svg>
+                        </div>
+                        <h3
+                          className={`text-xl font-bold mb-2 ${
+                            isDarkMode ? "text-white" : "text-black"
+                          }`}
+                        >
+                          Email Sent!
+                        </h3>
+                        <p
+                          className={`mb-6 ${
+                            isDarkMode ? "text-gray-300" : "text-gray-900"
+                          }`}
+                        >
+                          We've sent a password reset link to your email. You'll
+                          be redirected to the reset page shortly.
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        <h3
+                          className={`text-xl font-bold mb-4 ${
+                            isDarkMode ? "text-white" : "text-gray-900"
+                          }`}
+                        >
+                          Reset Password
+                        </h3>
+                        <p
+                          className={`${
+                            isDarkMode ? "text-gray-300" : "text-gray-600"
+                          }`}
+                        >
+                          Enter your email address and we'll send you a link to
+                          reset your password.
+                        </p>
+                        <div className="mb-4">
+                          <label
+                            htmlFor="reset-email"
+                            className={`block text-sm font-medium mb-2 ${
+                              isDarkMode ? "text-gray-200" : "text-gray-900"
+                            }`}
+                          >
+                            Email address
+                          </label>
+                          <input
+                            id="reset-email"
+                            type="email"
+                            className={`w-full px-3 py-2 rounded-lg border ${
+                              isDarkMode
+                                ? "bg-black/20 border-white/30 text-white"
+                                : "bg-white border-gray-300 text-black"
+                            } focus:outline-none focus:ring-2 focus:ring-[#625080]`}
+                            placeholder="Enter your email"
+                            value={resetEmail}
+                            onChange={(e) => setResetEmail(e.target.value)}
+                          />
+                        </div>
+                        {resetError && (
+                          <div
+                            className={`rounded-lg text-sm my-2 -mt-4 h-4 ${
+                              isDarkMode ? "text-red-200" : " text-red-700"
+                            }`}
+                          >
+                            {resetError}
+                          </div>
+                        )}
+
+                        <div className="flex justify-end space-x-3">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowForgotPasswordModal(false);
+                              setResetEmail("");
+                              setResetError("");
+                            }}
+                            className={`px-4 py-2 rounded-md cursor-pointer ${
+                              isDarkMode
+                                ? "bg-gray-700 text-white hover:bg-gray-600"
+                                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                            }`}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handlePasswordReset}
+                            className={`px-4 py-2 w-full rounded-md text-white cursor-pointer ${
+                              isDarkMode
+                                ? "bg-[#625080] hover:bg-[#7a649e]"
+                                : "bg-indigo-600 hover:bg-indigo-700"
+                            }`}
+                            disabled={resetLoading}
+                          >
+                            {resetLoading ? "Sending..." : "Send Reset Link"}
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Submit Button */}

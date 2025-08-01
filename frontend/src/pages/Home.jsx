@@ -209,7 +209,7 @@ const Home = () => {
               />
               <button
                 type="submit"
-                className={`absolute right-2 top-1/2 transform -translate-y-1/2 
+                className={`absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer 
                   rounded-full p-3 transition-colors
                   ${
                     isDarkMode
@@ -381,8 +381,8 @@ const Home = () => {
             className={`px-6 py-2 rounded-lg transition-all flex items-center gap-2 text-sm sm:text-base
               ${
                 isDarkMode
-                  ? "bg-white/20 hover:bg-white/30 text-white border-white/30 hover:border-white/50"
-                  : "bg-black/20 hover:bg-black/30 text-black border-black/30 hover:border-black/50"
+                  ? "bg-[#7A649E] hover:bg-[#886fb0] text-white border-[#886fb0] hover:border-[#7A649E]"
+                  : "bg-[#4F39F6] hover:bg-[#5b4cff] text-white border-[#5b4cff] hover:border-[#4F39F6]"
               }`}
           >
             View All Posts

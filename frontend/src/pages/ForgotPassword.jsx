@@ -121,8 +121,8 @@ const ForgotPassword = () => {
         <div
           className={`${
             isDarkMode
-              ? 'bg-white/10 backdrop-blur-md border border-white/20'
-              : 'bg-white/10 shadow-xl border border-black/20'
+              ? 'bg-black/70 backdrop-blur-md border border-white/20'
+              : 'bg-white/70 shadow-xl border border-black/20'
           } rounded-2xl p-8 transition-all duration-300`}
         >
           {/* Back Link */}

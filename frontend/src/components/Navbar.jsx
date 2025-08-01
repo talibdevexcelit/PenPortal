@@ -38,7 +38,7 @@ const Navbar = () => {
         ${
           isDarkMode
             ? "bg-black/40 border-white/20 text-white"
-            : "bg-white/40 border-gray-200 text-black shadow-sm"
+            : "bg-white/70 border-gray-200 text-black shadow-sm"
         }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
