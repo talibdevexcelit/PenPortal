@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,8 @@ const Register = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
   const { isDarkMode } = useTheme(); // Use current theme
@@ -114,114 +117,178 @@ const Register = () => {
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="space-y-4">
               {/* Full Name */}
-              <div>
-                <label
-                  htmlFor="name"
-                  className={`block text-sm font-medium mb-2 ${
-                    isDarkMode ? 'text-gray-200' : 'text-gray-900'
-                  }`}
-                >
-                  Full Name
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all
-                    ${
-                      isDarkMode
-                        ? 'bg-black/20 border-white/30 text-white placeholder-gray-400 focus:ring-[#625080]/50'
-                        : 'bg-white/20 border-black/20 text-black placeholder-gray-600 focus:ring-indigo-500 focus:border-indigo-500'
-                    }`}
-                  placeholder="Enter your full name"
-                />
-              </div>
+<div>
+  <label
+    htmlFor="name"
+    className={`block text-sm font-medium mb-2 ${
+      isDarkMode ? 'text-gray-200' : 'text-gray-900'
+    }`}
+  >
+    Full Name
+  </label>
+  <div
+    className={`relative ${
+      isDarkMode
+        ? 'bg-black/20 border-white/30 text-white'
+        : 'bg-white/20 border-black/20 text-black'
+    } border rounded-lg focus-within:ring-2 focus-within:ring-[#625080]`}
+  >
+    <User
+      className={`absolute left-3 top-3.5 h-5 w-5 ${
+        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+      }`}
+    />
+    <input
+      id="name"
+      name="name"
+      type="text"
+      required
+      value={formData.name}
+      onChange={handleChange}
+      className={`w-full px-10 py-3 rounded-lg border-0 bg-transparent focus:outline-none focus:ring-0
+        ${isDarkMode ? 'text-white placeholder-gray-400' : 'text-black placeholder-gray-600'}
+      `}
+      placeholder="Enter your full name"
+    />
+  </div>
+</div>
 
               {/* Email */}
-              <div>
-                <label
-                  htmlFor="email"
-                  className={`block text-sm font-medium mb-2 ${
-                    isDarkMode ? 'text-gray-200' : 'text-gray-900'
-                  }`}
-                >
-                  Email address
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all
-                    ${
-                      isDarkMode
-                        ? 'bg-black/20 border-white/30 text-white placeholder-gray-400 focus:ring-[#625080]/50'
-                        : 'bg-white/20 border-black/20 text-black placeholder-gray-600 focus:ring-indigo-500 focus:border-indigo-500'
-                    }`}
-                  placeholder="Enter your email"
-                />
-              </div>
+<div>
+  <label
+    htmlFor="email"
+    className={`block text-sm font-medium mb-2 ${
+      isDarkMode ? 'text-gray-200' : 'text-gray-900'
+    }`}
+  >
+    Email address
+  </label>
+  <div
+    className={`relative ${
+      isDarkMode
+        ? 'bg-black/20 border-white/30 text-white'
+        : 'bg-white/20 border-black/20 text-black'
+    } border rounded-lg focus-within:ring-2 focus-within:ring-[#625080]`}
+  >
+    <Mail
+      className={`absolute left-3 top-3.5 h-5 w-5 ${
+        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+      }`}
+    />
+    <input
+      id="email"
+      name="email"
+      type="email"
+      autoComplete="email"
+      required
+      value={formData.email}
+      onChange={handleChange}
+      className={`w-full px-10 py-3 rounded-lg border-0 bg-transparent focus:outline-none focus:ring-0
+        ${isDarkMode ? 'text-white placeholder-gray-400' : 'text-black placeholder-gray-600'}
+      `}
+      placeholder="Enter your email"
+    />
+  </div>
+</div>
 
               {/* Password */}
-              <div>
-                <label
-                  htmlFor="password"
-                  className={`block text-sm font-medium mb-2 ${
-                    isDarkMode ? 'text-gray-200' : 'text-gray-900'
-                  }`}
-                >
-                  Password
-                </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  minLength="6"
-                  className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all
-                    ${
-                      isDarkMode
-                        ? 'bg-black/20 border-white/30 text-white placeholder-gray-400 focus:ring-[#625080]/50'
-                        : 'bg-white/20 border-black/20 text-black placeholder-gray-600 focus:ring-indigo-500 focus:border-indigo-500'
-                    }`}
-                  placeholder="Enter your password"
-                />
-              </div>
+<div>
+  <label
+    htmlFor="password"
+    className={`block text-sm font-medium mb-2 ${
+      isDarkMode ? 'text-gray-200' : 'text-gray-900'
+    }`}
+  >
+    Password
+  </label>
+  <div
+    className={`relative ${
+      isDarkMode
+        ? 'bg-black/20 border-white/30 text-white'
+        : 'bg-white/20 border-black/20 text-black'
+    } border rounded-lg focus-within:ring-2 focus-within:ring-[#625080]`}
+  >
+    <Lock
+      className={`absolute left-3 top-3 h-5 w-5 ${
+        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+      }`}
+    />
+    <input
+      id="password"
+      name="password"
+      type={showPassword ? 'text' : 'password'}
+      required
+      value={formData.password}
+      onChange={handleChange}
+      minLength="6"
+      className={`w-full px-10 py-3 rounded-lg border-0 bg-transparent focus:outline-none focus:ring-0
+        ${isDarkMode ? 'text-white placeholder-gray-400' : 'text-black placeholder-gray-600'}
+      `}
+      placeholder="Enter your password"
+    />
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      className="absolute right-3 top-3.5 text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer"
+      aria-label={showPassword ? 'Hide password' : 'Show password'}
+    >
+      {showPassword ? (
+        <Eye className="h-5 w-5" />
+      ) : (
+        <EyeOff className="h-5 w-5" />
+      )}
+    </button>
+  </div>
+</div>
 
               {/* Confirm Password */}
-              <div>
-                <label
-                  htmlFor="confirmPassword"
-                  className={`block text-sm font-medium mb-2 ${
-                    isDarkMode ? 'text-gray-200' : 'text-gray-900'
-                  }`}
-                >
-                  Confirm Password
-                </label>
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  required
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all
-                    ${
-                      isDarkMode
-                        ? 'bg-black/20 border-white/30 text-white placeholder-gray-400 focus:ring-[#625080]/50'
-                        : 'bg-white/20 border-black/20 text-black placeholder-gray-600 focus:ring-indigo-500 focus:border-indigo-500'
-                    }`}
-                  placeholder="Confirm your password"
-                />
-              </div>
+<div>
+  <label
+    htmlFor="confirmPassword"
+    className={`block text-sm font-medium mb-2 ${
+      isDarkMode ? 'text-gray-200' : 'text-gray-900'
+    }`}
+  >
+    Confirm Password
+  </label>
+  <div
+    className={`relative ${
+      isDarkMode
+        ? 'bg-black/20 border-white/30 text-white'
+        : 'bg-white/20 border-black/20 text-black'
+    } border rounded-lg focus-within:ring-2 focus-within:ring-[#625080]`}
+  >
+    <Lock
+      className={`absolute left-3 top-3 h-5 w-5 ${
+        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+      }`}
+    />
+    <input
+      id="confirmPassword"
+      name="confirmPassword"
+      type={showConfirmPassword ? 'text' : 'password'}
+      required
+      value={formData.confirmPassword}
+      onChange={handleChange}
+      className={`w-full px-10 py-3 rounded-lg border-0 bg-transparent focus:outline-none focus:ring-0
+        ${isDarkMode ? 'text-white placeholder-gray-400' : 'text-black placeholder-gray-600'}
+      `}
+      placeholder="Confirm your password"
+    />
+    <button
+      type="button"
+      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+      className="absolute right-3 top-3.5 text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer"
+      aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+    >
+      {showConfirmPassword ? (
+        <Eye className="h-5 w-5" />
+      ) : (
+        <EyeOff className="h-5 w-5" />
+      )}
+    </button>
+  </div>
+</div>
             </div>
 
             {/* Terms Checkbox */}

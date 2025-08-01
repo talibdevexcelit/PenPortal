@@ -8,14 +8,17 @@ import {
   getSinglePost,
   getUserPosts,
   updatePost,
+  getSearchSuggestions,
 } from "../controllers/postController.js";
 import { admin, protect } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
 // Blog API endpoints - RESTful pattern
-router.get("/post", getAllPosts);
+router.get("/post/suggestions", getSearchSuggestions); // Search suggestions endpoint
+router.get("/post/search", getAllPosts); // Search endpoint using the same controller
 router.get("/post/:id", getSinglePost);
+router.get("/post", getAllPosts);
 
 // Protected routes - only authenticated users can access
 router.post("/post", protect, createPost);

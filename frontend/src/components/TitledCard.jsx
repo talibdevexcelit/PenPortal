@@ -113,7 +113,7 @@ const TiltedCard = ({
         <div className="flex items-center justify-between mb-4">
           <span
             className={`text-xs font-medium ${
-              isDarkMode ? 'text-blue-300' : 'text-indigo-600'
+              isDarkMode ? 'text-blue-300' : 'text-blue-600'
             }`}
           >
             {author}
@@ -136,7 +136,7 @@ const TiltedCard = ({
                 className={`px-2 py-1 text-xs rounded-full border transition-all ${
                   isDarkMode
                     ? 'bg-white/15 backdrop-blur-sm border-white/20 text-gray-200'
-                    : 'bg-indigo-50 border-indigo-200 text-indigo-700'
+                    : 'bg-indigo-50 border-indigo-200 text-black'
                 }`}
               >
                 #{tag}
@@ -159,7 +159,7 @@ const TiltedCard = ({
           className={`mt-auto w-full py-2 rounded-lg text-sm font-medium transition-all backdrop-blur-sm border cursor-pointer ${
             isDarkMode
               ? 'bg-white/20 hover:bg-white/30 text-white border-white/30 hover:border-white/50'
-              : 'bg-indigo-100 hover:bg-indigo-200 text-indigo-700 border-indigo-200 hover:border-indigo-300'
+              : 'bg-indigo-100 hover:bg-indigo-200 text-black border-indigo-200 hover:border-indigo-300'
           }`}
           onClick={(e) => {
             e.stopPropagation();

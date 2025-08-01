@@ -256,7 +256,7 @@ const Profile = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full py-2 px-4 font-medium rounded-lg transition-colors
+                className={`w-full py-2 px-4 font-medium rounded-lg transition-colors cursor-pointer
                   ${
                     isDarkMode
                       ? "bg-[#625080] disabled:bg-gray-500 text-white hover:bg-[#7a649e]"
@@ -391,8 +391,8 @@ const Profile = () => {
                         </Link>
                         <button
                           onClick={() => handleEditPost(post)}
-                          className={`text-sm font-medium hover:underline ${
-                            isDarkMode ? "text-yellow-400 hover:text-yellow-300" : "text-indigo-600 hover:text-indigo-800"
+                          className={`text-sm font-medium hover:underline cursor-pointer ${
+                            isDarkMode ? "text-blue-400 hover:text-blue-300" : "text-indigo-600 hover:text-indigo-800"
                           }`}
                         >
                           Edit
@@ -400,7 +400,7 @@ const Profile = () => {
                         <button
                           onClick={() => handleDeletePost(post._id)}
                           disabled={deleteLoading}
-                          className={`text-sm font-medium hover:underline ${
+                          className={`text-sm font-medium hover:underline cursor-pointer ${
                             isDarkMode
                               ? "text-red-400 hover:text-red-300"
                               : "text-red-600 hover:text-red-800"

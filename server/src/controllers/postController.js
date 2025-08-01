@@ -3,7 +3,22 @@ import Post from "../models/Post.js";
 // Get All Posts
 export const getAllPosts = async (req, res) => {
   try {
-    const posts = await Post.find().sort({ createdAt: -1 });
+    const { search } = req.query;
+    let query = {};
+    
+    // If search parameter exists, create a search query
+    if (search) {
+      query = {
+        $or: [
+          { title: { $regex: search, $options: 'i' } },
+          { content: { $regex: search, $options: 'i' } },
+          { author: { $regex: search, $options: 'i' } },
+          { tags: { $in: [new RegExp(search, 'i')] } }
+        ]
+      };
+    }
+    
+    const posts = await Post.find(query).sort({ createdAt: -1 });
     res.status(200).json({
       status: true,
       message: "Posts retrieved successfully",
@@ -265,6 +280,51 @@ export const deletePostAdmin = async (req, res) => {
     res.status(500).json({
       status: false,
       message: "Failed to delete post",
+      data: null,
+      error: { message: error.message },
+    });
+  }
+};
+
+// Search Suggestions
+export const getSearchSuggestions = async (req, res) => {
+  try {
+    const { query } = req.query;
+    
+    if (!query || query.trim() === '') {
+      return res.status(200).json({
+        status: true,
+        message: "No search query provided",
+        data: [],
+        error: null,
+      });
+    }
+    
+    // Create a search query for suggestions
+    const searchQuery = {
+      $or: [
+        { title: { $regex: query, $options: 'i' } },
+        { author: { $regex: query, $options: 'i' } },
+        { tags: { $in: [new RegExp(query, 'i')] } }
+      ]
+    };
+    
+    // Find posts matching the query and limit to 10 results
+    const suggestions = await Post.find(searchQuery)
+      .select('title author tags') // Only return these fields
+      .limit(10)
+      .sort({ createdAt: -1 });
+    
+    res.status(200).json({
+      status: true,
+      message: "Search suggestions retrieved successfully",
+      data: suggestions,
+      error: null,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: false,
+      message: "Failed to retrieve search suggestions",
       data: null,
       error: { message: error.message },
     });

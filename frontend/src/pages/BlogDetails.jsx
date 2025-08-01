@@ -270,7 +270,7 @@ const BlogDetails = () => {
                   className={`px-3 py-1 text-sm rounded-full backdrop-blur-sm
                     ${
                       isDarkMode
-                        ? 'bg-[#625080]/20 text-[#625080] border border-[#625080]/30'
+                        ? 'bg-[#625080]/20 text-[#d6d2db] border border-[#625080]/30'
                         : 'bg-indigo-100 text-indigo-800 border border-indigo-200'
                     }`}
                 >

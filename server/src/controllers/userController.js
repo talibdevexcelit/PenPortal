@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import crypto from 'crypto';
 
 
 export const registerUser = async (req, res) => {
@@ -163,3 +164,181 @@ export const updateUserProfile = async (req, res) => {
     });
   }
 };
+
+// Forgot Password - Step 1: Verify email and generate token
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        status: false,
+        message: "Please provide your email address",
+        data: null,
+        error: { message: "Email is required" }
+      });
+    }
+
+    // Find user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        status: false,
+        message: "No account found with that email",
+        data: null,
+        error: { message: "Email not found" }
+      });
+    }
+
+    // Generate reset token
+    const resetToken = user.generateResetToken();
+    await user.save({ validateBeforeSave: false });
+
+    // In a production environment, you would send an email with the reset link
+    // For this implementation, we'll just return the token in the response
+    res.status(200).json({
+      status: true,
+      message: "Password reset initiated. Please check your email.",
+      data: {
+        resetToken // In production, don't expose this token
+      },
+      error: null
+    });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({
+      status: false,
+      message: "Failed to process password reset",
+      data: null,
+      error: { message: error.message }
+    });
+  }
+};
+
+// Reset Password - Step 2: Verify token and set new password
+export const resetPassword = async (req, res) => {
+  try {
+    const { token, password } = req.body;
+
+    if (!token || !password) {
+      return res.status(400).json({
+        status: false,
+        message: "Please provide reset token and new password",
+        data: null,
+        error: { message: "Missing required fields" }
+      });
+    }
+
+    // Hash the token to compare with stored hash
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    // Find user with the token and check if token is still valid
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpire: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        status: false,
+        message: "Invalid or expired reset token",
+        data: null,
+        error: { message: "Token invalid" }
+      });
+    }
+
+    // Set new password
+    user.password = password;
+    
+    // Clear reset token fields
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    // Generate new auth token
+    const authToken = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '30d' }
+    );
+
+    res.status(200).json({
+      status: true,
+      message: "Password has been reset successfully",
+      data: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        token: authToken
+      },
+      error: null
+    });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    res.status(500).json({
+      status: false,
+      message: "Failed to reset password",
+      data: null,
+      error: { message: error.message }
+    });
+  }
+};
+
+// Verify Email - Step 1.5: Verify if token is valid (without changing password)
+export const verifyResetToken = async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    if (!token) {
+      return res.status(400).json({
+        status: false,
+        message: "Reset token is required",
+        data: null,
+        error: { message: "Missing token" }
+      });
+    }
+
+    // Hash the token to compare with stored hash
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    // Find user with the token and check if token is still valid
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpire: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        status: false,
+        message: "Invalid or expired reset token",
+        data: null,
+        error: { message: "Token invalid" }
+      });
+    }
+
+    res.status(200).json({
+      status: true,
+      message: "Token is valid",
+      data: {
+        email: user.email
+      },
+      error: null
+    });
+  } catch (error) {
+    console.error("Verify reset token error:", error);
+    res.status(500).json({
+      status: false,
+      message: "Failed to verify reset token",
+      data: null,
+      error: { message: error.message }
+    });
+  }
+}
