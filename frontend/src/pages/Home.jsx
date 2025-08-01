@@ -381,8 +381,8 @@ const Home = () => {
             className={`px-6 py-2 rounded-lg transition-all flex items-center gap-2 text-sm sm:text-base
               ${
                 isDarkMode
-                  ? "bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50 backdrop-blur-sm"
-                  : "bg-gray-200 hover:bg-gray-300 text-black border border-gray-300 hover:border-gray-400"
+                  ? "bg-white/20 hover:bg-white/30 text-white border-white/30 hover:border-white/50"
+                  : "bg-black/20 hover:bg-black/30 text-black border-black/30 hover:border-black/50"
               }`}
           >
             View All Posts

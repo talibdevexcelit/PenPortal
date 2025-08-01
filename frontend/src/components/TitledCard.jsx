@@ -159,7 +159,7 @@ const TiltedCard = ({
           className={`mt-auto w-full py-2 rounded-lg text-sm font-medium transition-all backdrop-blur-sm border cursor-pointer ${
             isDarkMode
               ? 'bg-white/20 hover:bg-white/30 text-white border-white/30 hover:border-white/50'
-              : 'bg-indigo-100 hover:bg-indigo-200 text-black border-indigo-200 hover:border-indigo-300'
+              : 'bg-black/20 hover:bg-black/30 text-black border-black/30 hover:border-black/50'
           }`}
           onClick={(e) => {
             e.stopPropagation();
