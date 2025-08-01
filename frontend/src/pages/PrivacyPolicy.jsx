@@ -11,8 +11,8 @@ const PrivacyPolicy = () => {
       <div
         className={`max-w-3xl w-full ${
           isDarkMode
-            ? 'bg-white/10 backdrop-blur-md border border-white/20 text-gray-100'
-            : 'bg-white/10 shadow-xl border border-black/20 text-gray-800'
+            ? 'bg-black/70 backdrop-blur-md border border-white/20 text-gray-100'
+            : 'bg-white/70 shadow-xl border border-black/20 text-gray-800'
         } rounded-2xl p-8 transition-all duration-300`}
       >
         <Link

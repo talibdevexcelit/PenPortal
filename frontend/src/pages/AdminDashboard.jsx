@@ -176,8 +176,8 @@ const AdminDashboard = () => {
         <div
           className={`${
             isDarkMode
-              ? "bg-white/10 backdrop-blur-md border border-white/20"
-              : "bg-white/80 shadow-md border border-gray-200"
+              ? "bg-black/70 backdrop-blur-md border border-white/20"
+              : "bg-white/70 shadow-md border border-gray-200"
           } rounded-2xl p-6 transition-all duration-300`}
         >
           <div className="flex items-center">
@@ -236,8 +236,8 @@ const AdminDashboard = () => {
         <div
           className={`${
             isDarkMode
-              ? "bg-white/10 backdrop-blur-md border border-white/20"
-              : "bg-white/80 shadow-md border border-gray-200"
+              ? "bg-black/70 backdrop-blur-md border border-white/20"
+              : "bg-white/70 shadow-md border border-gray-200"
           } rounded-2xl p-6 transition-all duration-300`}
         >
           <div className="flex items-center">
@@ -296,8 +296,8 @@ const AdminDashboard = () => {
         <div
           className={`${
             isDarkMode
-              ? "bg-white/10 backdrop-blur-md border border-white/20"
-              : "bg-white/80 shadow-md border border-gray-200"
+              ? "bg-black/70 backdrop-blur-md border border-white/20"
+              : "bg-white/70 shadow-md border border-gray-200"
           } rounded-2xl p-6 transition-all duration-300`}
         >
           <div className="flex items-center">
@@ -426,8 +426,8 @@ const AdminDashboard = () => {
         <div
           className={`${
             isDarkMode
-              ? "bg-white/10 backdrop-blur-md border border-white/20"
-              : "bg-white/80 shadow-md border border-gray-200"
+              ? "bg-black/70 backdrop-blur-md border border-white/20"
+              : "bg-white/70 shadow-md border border-gray-200"
           } rounded-2xl p-6 transition-all duration-300`}
         >
           <div className="flex justify-between items-center mb-6">
@@ -622,8 +622,8 @@ const AdminDashboard = () => {
         <div
           className={`${
             isDarkMode
-              ? "bg-white/10 backdrop-blur-md border border-white/20"
-              : "bg-white/80 shadow-md border border-gray-200"
+              ? "bg-black/70 backdrop-blur-md border border-white/20"
+              : "bg-white/70 shadow-md border border-gray-200"
           } rounded-2xl p-6 transition-all duration-300`}
         >
           <div className="flex justify-between items-center mb-6">
