@@ -308,11 +308,11 @@ const Home = () => {
                               : ""
                           }`}
                       >
-                        <div className="font-medium text-base">
+                        <div className="font-medium text-base flex">
                           {suggestion.title}
                         </div>
                         <div
-                          className={`text-sm mt-1 ${
+                          className={`text-sm mt-1 flex ${
                             isDarkMode ? "text-gray-400" : "text-gray-500"
                           }`}
                         >
